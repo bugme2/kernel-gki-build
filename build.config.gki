@@ -1,0 +1,25 @@
+DEFCONFIG=gki_defconfig
+POST_DEFCONFIG_CMDS="check_defconfig && update_config"
+function update_config() {
+    ${KERNEL_DIR}/scripts/config --file ${OUT_DIR}/.config \
+         -e CONFIG_NTFS_FS \
+         -e CONFIG_NTFS_RW \
+         -e CONFIG_BTRFS_FS \
+         -e CONFIG_XFS_FS \
+         -e CONFIG_IP_SET \
+         -e CONFIG_IP_SET_HASH_NET \
+         -e CONFIG_IP_SET_HASH_NETNET \
+         -e CONFIG_IP_SET_HASH_NETPORT \
+         -e CONFIG_IP_SET_HASH_NETIFACE \
+         -e CONFIG_IP_SET_LIST_SET \
+         -e CONFIG_NETFILTER_XT_SET \
+         -e CONFIG_TCP_CONG_ADVANCED \
+         -e CONFIG_TCP_CONG_BBR \
+         -e CONFIG_TCP_CONG_BIC\
+         -e CONFIG_TCP_CONG_HTCP \
+         -e CONFIG_TCP_CONG_WESTWOOD \
+         -e CONFIG_DEFAULT_BBR
+    (cd ${OUT_DIR} && \
+     make ${TOOL_ARGS} O=${OUT_DIR} olddefconfig)
+}
+

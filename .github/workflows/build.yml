@@ -1,0 +1,49 @@
+name: Kernel Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build on ubuntu-latest
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt update && sudo apt install repo -y
+          sudo git config --global user.name "root"
+          sudo git config --global user.email "localhost"
+          sudo timedatectl set-timezone Asia/Shanghai
+
+      - name: Setup kernel source
+        run: |
+          repo init --repo-rev=v2.16 --depth=1 -u https://android.googlesource.com/kernel/manifest -b common-android13-5.15-lts
+          repo sync -c --no-tags
+
+      - name: Download artifacts
+        uses: actions/checkout@v4
+        with:
+          path: mod
+          fetch-depth: 1
+
+      - name: Setup KernelSU
+        run: |
+          bash <(curl -Ls https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh)
+          cat KernelSU/kernel/export_symbol.txt | awk '{sub("[ \t]+","");print "  "$0}' >> common/android/abi_gki_aarch64
+
+      - name: Build images
+        run: |
+          cp -r mod/oplus common/drivers/soc
+          printf "obj-y += oplus/storage/\n" >> common/drivers/soc/Makefile
+          sed -i "/endmenu/i\\source \"drivers/soc/oplus/storage/Kconfig\"" common/drivers/soc/Kconfig
+          cp mod/build.config.gki common/build.config.gki
+          sed -i 's/ -dirty//g' common/scripts/setlocalversion
+          LTO=thin BUILD_CONFIG=common/build.config.gki.aarch64 build/build.sh
+          echo "BUILD_TIME=$(date +'%Y-%m-%d-%H%M')" >> $GITHUB_ENV
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.BUILD_TIME }}
+          path: out/android13-5.15/dist/boot.img
