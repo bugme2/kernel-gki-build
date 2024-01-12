@@ -29,7 +29,7 @@ jobs:
 
       - name: Setup KernelSU
         run: |
-          bash <(curl -Ls https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh)
+          curl -LSs https://raw.githubusercontent.com/wxt1221/KernelSU/main/kernel/setup.sh | bash -s main
           cat KernelSU/kernel/export_symbol.txt | awk '{sub("[ \t]+","");print "  "$0}' >> common/android/abi_gki_aarch64
 
       - name: Build images
