@@ -23,8 +23,8 @@ jobs:
       - name: Install dependencies
         run: |
           docker rmi $(docker images -q)
-          sudo rm -rf /usr/share/dotnet /etc/apt/sources.list.d /usr/local/lib/android $AGENT_TOOLSDIRECTORY
-          sudo -E apt -y purge azure-cli ghc* zulu* llvm* firefox google* dotnet* powershell openjdk* mongodb* moby* || true
+          sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc /etc/mysql /etc/php
+          sudo -E apt -y purge azure-cli* docker* ghc* zulu* hhvm* llvm* firefox* google* dotnet* aspnetcore* powershell* openjdk* adoptopenjdk* mysql* php* mongodb* moby* snap* || true
           sudo apt -y autoremove --purge
           sudo apt update && sudo apt install repo -y
           sudo git config --global user.name "root"
