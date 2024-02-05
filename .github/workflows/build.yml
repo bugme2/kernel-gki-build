@@ -27,6 +27,7 @@ jobs:
           sudo -E apt -y purge azure-cli* docker* ghc* zulu* hhvm* llvm* firefox* google* dotnet* aspnetcore* powershell* openjdk* adoptopenjdk* mysql* php* mongodb* moby* snap* || true
           sudo apt -y autoremove --purge
           sudo apt update && sudo apt install repo -y
+          sudo apt clean
           sudo git config --global user.name "root"
           sudo git config --global user.email "localhost"
           sudo timedatectl set-timezone Asia/Shanghai
