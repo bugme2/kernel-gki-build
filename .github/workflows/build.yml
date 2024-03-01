@@ -40,7 +40,7 @@ jobs:
 
       - name: Setup KernelSU
         run: |
-          curl -LSs https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh | bash -s main
+          curl -LSs https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh | bash
           cat KernelSU/kernel/export_symbol.txt | awk '{sub("[ \t]+","");print "  "$0}' >> common/android/abi_gki_aarch64
 
       - name: Build images
@@ -48,6 +48,7 @@ jobs:
           wget -O common/build.config.gki https://raw.githubusercontent.com/bugme2/kernel-gki-build/main/build.config.gki
           sed -i 's/ -dirty//g' common/scripts/setlocalversion
           sed -i 's/return mode == THERMAL_DEVICE_ENABLED/return mode == THERMAL_DEVICE_DISABLED/' common/drivers/thermal/thermal_core.c
+          sed -i 's/DKSU_VERSION=16/DKSU_VERSION=11581/' common/drivers/kernelsu/Makefile
           tools/bazel run --config=release --lto=thin //common:kernel_aarch64_dist -- --dist_dir=out
           echo "BUILD_TIME=$(date +'%Y-%m-%d-%H%M')" >> $GITHUB_ENV
 
