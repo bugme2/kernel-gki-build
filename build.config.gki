@@ -22,7 +22,9 @@ function update_config() {
          -d THERMAL_GOV_USER_SPACE \
          -d CONFIG_THERMAL_GOV_POWER_ALLOCATOR \
          -d CONFIG_HISI_THERMAL \
-         -d CONFIG_THERMAL_EMULATION
+         -d CONFIG_THERMAL_EMULATION \
+         -d CONFIG_ARM_SCPI_CPUFREQ \
+         -d CONFIG_ARM_SCMI_CPUFREQ
     (cd ${OUT_DIR} && \
      make ${TOOL_ARGS} O=${OUT_DIR} olddefconfig)
 }
