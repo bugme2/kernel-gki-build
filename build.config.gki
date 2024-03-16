@@ -23,6 +23,7 @@ function update_config() {
          -d CONFIG_THERMAL_GOV_POWER_ALLOCATOR \
          -d CONFIG_HISI_THERMAL \
          -d CONFIG_CPU_IDLE_THERMAL \
+         -d CONFIG_CPU_FREQ_THERMAL \
          -d CONFIG_THERMAL_EMULATION \
          -d CONFIG_ARM_SCPI_CPUFREQ \
          -d CONFIG_ARM_SCMI_CPUFREQ
