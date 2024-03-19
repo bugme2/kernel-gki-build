@@ -34,8 +34,8 @@ jobs:
 
       - name: Setup kernel source
         run: |
-          repo init --repo-rev=v2.16 --depth=1 -u https://android.googlesource.com/kernel/manifest -b common-android13-5.15-lts
-          #sed -i '/\"common\"/s/android13-5.15-2023-01/deprecated\/android13-5.15-2023-01/g' .repo/manifests/default.xml
+          repo init --repo-rev=v2.16 --depth=1 -u https://android.googlesource.com/kernel/manifest -b common-android13-5.15-2023-01
+          sed -i '/\"common\"/s/android13-5.15-2023-01/deprecated\/android13-5.15-2023-01/g' .repo/manifests/default.xml
           repo sync -c --no-tags
 
       - name: Setup KernelSU
