@@ -1,0 +1,252 @@
+diff --git a/android/abi_gki_aarch64.stg b/android/abi_gki_aarch64.stg
+index df9d7ae83..8f05a556c 100644
+--- a/android/abi_gki_aarch64.stg
++++ b/android/abi_gki_aarch64.stg
+@@ -347098,6 +347098,33 @@ elf_symbol {
+   type_id: 0x9bb2f28e
+   full_name: "__traceiter_android_vh_binder_select_worklist_ilocked"
+ }
++elf_symbol {
++  id: 0x175f643d
++  name: "__traceiter_android_vh_binder_set_desc_bit"
++  is_defined: true
++  symbol_type: FUNCTION
++  crc: 0x871b8714
++  type_id: 0x9bd683f2
++  full_name: "__traceiter_android_vh_binder_set_desc_bit"
++}
++elf_symbol {
++  id: 0x8eeeee63
++  name: "__traceiter_android_vh_binder_desc_init"
++  is_defined: true
++  symbol_type: FUNCTION
++  crc: 0x9669be09
++  type_id: 0x9bd18c9d
++  full_name: "__traceiter_android_vh_binder_desc_init"
++}
++elf_symbol {
++  id: 0xbd66b22b
++  name: "__traceiter_android_vh_binder_find_desc"
++  is_defined: true
++  symbol_type: FUNCTION
++  crc: 0x76ef4b68
++  type_id: 0x9bd2f77e
++  full_name: "__traceiter_android_vh_binder_find_desc"
++}
+ elf_symbol {
+   id: 0x2a9c6616
+   name: "__traceiter_android_vh_binder_set_priority"
+@@ -351931,6 +351958,33 @@ elf_symbol {
+   type_id: 0x18ccbd2c
+   full_name: "__tracepoint_android_vh_binder_detect_low_async_space"
+ }
++elf_symbol {
++  id: 0xc7c51849
++  name: "__tracepoint_android_vh_binder_find_desc"
++  is_defined: true
++  symbol_type: OBJECT
++  crc: 0xb9c9d753
++  type_id: 0x18ccbd2c
++  full_name: "__tracepoint_android_vh_binder_find_desc"
++}
++elf_symbol {
++  id: 0x8cd38e13
++  name: "__tracepoint_android_vh_binder_set_desc_bit"
++  is_defined: true
++  symbol_type: OBJECT
++  crc: 0x49a213a6
++  type_id: 0x18ccbd2c
++  full_name: "__tracepoint_android_vh_binder_set_desc_bit"
++}
++elf_symbol {
++  id: 0x45c2b265
++  name: "__tracepoint_android_vh_binder_desc_init"
++  is_defined: true
++  symbol_type: OBJECT
++  crc: 0x542d054e
++  type_id: 0x18ccbd2c
++  full_name: "__tracepoint_android_vh_binder_desc_init"
++}
+ elf_symbol {
+   id: 0x19dded7c
+   name: "__tracepoint_android_vh_binder_free_buf"
+@@ -356811,6 +356865,15 @@ elf_symbol {
+   type_id: 0x9eccfc59
+   full_name: "android_rvh_probe_register"
+ }
++elf_symbol {
++  id: 0x8df9ecba
++  name: "android_vh_pcpu_rwsem_handler"
++  is_defined: true
++  symbol_type: FUNCTION
++  crc: 0x86edb09b
++  type_id: 0x34682689
++  full_name: "android_vh_pcpu_rwsem_handler"
++}
+ elf_symbol {
+   id: 0x95eaf556
+   name: "anon_inode_getfd"
+diff --git a/android/abi_gki_aarch64_oplus b/android/abi_gki_aarch64_oplus
+index 655013a61..904672a48 100644
+--- a/android/abi_gki_aarch64_oplus
++++ b/android/abi_gki_aarch64_oplus
+@@ -1,4 +1,5 @@
+ [abi_symbol_list]
++  android_vh_pcpu_rwsem_handler
+   address_space_init_once
+   bio_add_page
+   bio_associate_blkg
+@@ -233,6 +234,9 @@
+   __traceiter_android_vh_rmqueue_bulk_bypass
+   __traceiter_android_vh_tune_mmap_readaround
+   __traceiter_android_vh_ra_tuning_max_page
++  __traceiter_android_vh_binder_find_desc
++  __traceiter_android_vh_binder_set_desc_bit
++  __traceiter_android_vh_binder_desc_init
+   __traceiter_android_vh_alloc_oem_binder_struct
+   __traceiter_android_vh_binder_transaction_received
+   __traceiter_android_vh_free_oem_binder_struct
+@@ -346,6 +350,9 @@
+   __tracepoint_sched_stat_wait
+   __tracepoint_sched_waking
+   __tracepoint_task_rename
++  __tracepoint_android_vh_binder_find_desc
++  __tracepoint_android_vh_binder_set_desc_bit
++  __tracepoint_android_vh_binder_desc_init
+   __tracepoint_android_vh_alloc_oem_binder_struct
+   __tracepoint_android_vh_binder_transaction_received
+   __tracepoint_android_vh_free_oem_binder_struct
+diff --git a/drivers/android/vendor_hooks.c b/drivers/android/vendor_hooks.c
+index 8fe40d59c..644c16815 100644
+--- a/drivers/android/vendor_hooks.c
++++ b/drivers/android/vendor_hooks.c
+@@ -403,6 +403,9 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(android_vh_timerfd_create);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(android_vh_binder_ioctl_end);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(android_vh_binder_looper_exited);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(android_vh_binder_spawn_new_thread);
++EXPORT_TRACEPOINT_SYMBOL_GPL(android_vh_binder_find_desc);
++EXPORT_TRACEPOINT_SYMBOL_GPL(android_vh_binder_set_desc_bit);
++EXPORT_TRACEPOINT_SYMBOL_GPL(android_vh_binder_desc_init);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(android_vh_binder_has_special_work_ilocked);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(android_vh_binder_detect_low_async_space);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(android_rvh_delayacct_init);
+diff --git a/include/trace/hooks/binder.h b/include/trace/hooks/binder.h
+index 93641ce4e..f8cda5a24 100644
+--- a/include/trace/hooks/binder.h
++++ b/include/trace/hooks/binder.h
+@@ -147,6 +147,16 @@ DECLARE_HOOK(android_vh_binder_spawn_new_thread,
+ DECLARE_HOOK(android_vh_binder_has_special_work_ilocked,
+ 	TP_PROTO(struct binder_thread *thread, bool do_proc_work, bool *has_work),
+ 	TP_ARGS(thread, do_proc_work, has_work));
++DECLARE_HOOK(android_vh_binder_find_desc,
++	TP_PROTO(struct binder_proc *proc, uint32_t *ref_desc,
++		struct rb_node *nd_desc, bool *loop),
++	TP_ARGS(proc, ref_desc, nd_desc, loop));
++DECLARE_HOOK(android_vh_binder_set_desc_bit,
++	TP_PROTO(struct binder_proc *proc, uint32_t ref_desc),
++	TP_ARGS(proc, ref_desc));
++DECLARE_HOOK(android_vh_binder_desc_init,
++	TP_PROTO(struct binder_proc *proc),
++	TP_ARGS(proc));
+ #endif /* _TRACE_HOOK_BINDER_H */
+ /* This part must be outside protection */
+ #include <trace/define_trace.h>
+diff --git a/fs/overlayfs/util.c b/fs/overlayfs/util.c
+index 63e0bdbd2..805523483 100644
+--- a/fs/overlayfs/util.c
++++ b/fs/overlayfs/util.c
+@@ -145,9 +145,7 @@ void ovl_dentry_init_flags(struct dentry *dentry, struct dentry *upperdentry,
+ bool ovl_dentry_weird(struct dentry *dentry)
+ {
+ 	return dentry->d_flags & (DCACHE_NEED_AUTOMOUNT |
+-				  DCACHE_MANAGE_TRANSIT |
+-				  DCACHE_OP_HASH |
+-				  DCACHE_OP_COMPARE);
++				  DCACHE_MANAGE_TRANSIT);
+ }
+ 
+ enum ovl_path_type ovl_path_type(struct dentry *dentry)
+diff --git a/include/linux/sched.h b/include/linux/sched.h
+index f5b50c82a..b630da89a 100644
+--- a/include/linux/sched.h
++++ b/include/linux/sched.h
+@@ -1096,8 +1096,10 @@ struct task_struct {
+ 	struct nameidata		*nameidata;
+ 
+ #ifdef CONFIG_SYSVIPC
+-	struct sysv_sem			sysvsem;
+-	struct sysv_shm			sysvshm;
++	// struct sysv_sem			sysvsem;
++	/* sysvsem is in the ANDROID_KABI_RESERVE(1) field below */
++	// struct sysv_shm			sysvshm;
++	/* sysvshm is in the ANDROID_KABI_RESERVE(1) field below */
+ #endif
+ #ifdef CONFIG_DETECT_HUNG_TASK
+ 	unsigned long			last_switch_count;
+@@ -1551,9 +1553,16 @@ struct task_struct {
+ 	ANDROID_KABI_RESERVE(3);
+ 	ANDROID_KABI_RESERVE(4);
+ 	ANDROID_KABI_RESERVE(5);
++#if defined(CONFIG_SYSVIPC)
++	// struct sysv_sem			sysvsem;
++	ANDROID_KABI_USE(6, struct sysv_sem sysvsem);
++	// struct sysv_shm			sysvshm;
++	_ANDROID_KABI_REPLACE(ANDROID_KABI_RESERVE(7); ANDROID_KABI_RESERVE(8), struct sysv_shm sysvshm);
++#else
+ 	ANDROID_KABI_RESERVE(6);
+ 	ANDROID_KABI_RESERVE(7);
+ 	ANDROID_KABI_RESERVE(8);
++#endif
+ 
+ 	/*
+ 	 * New fields for task_struct should be added above here, so that
+diff --git a/kernel/cgroup/cgroup.c b/kernel/cgroup/cgroup.c
+index f442cf56c..55e4d7736 100644
+--- a/kernel/cgroup/cgroup.c
++++ b/kernel/cgroup/cgroup.c
+@@ -4234,6 +4234,10 @@ static int cgroup_add_file(struct cgroup_subsys_state *css, struct cgroup *cgrp,
+ 		cfile->kn = kn;
+ 		spin_unlock_irq(&cgroup_file_kn_lock);
+ 	}
++	if (cft->ss && (cgrp->root->flags & CGRP_ROOT_NOPREFIX) && !(cft->flags & CFTYPE_NO_PREFIX)) {
++				snprintf(name, CGROUP_FILE_NAME_MAX, "%s.%s", cft->ss->name, cft->name);
++				kernfs_create_link(cgrp->kn, name, kn);
++	}
+ 
+ 	return 0;
+ }
+diff --git a/kernel/module/version.c b/kernel/module/version.c
+index 53f43ac5a..56a6c6bf1 100644
+--- a/kernel/module/version.c
++++ b/kernel/module/version.c
+@@ -52,7 +52,7 @@ int check_version(const struct load_info *info,
+ 
+ bad_version:
+ 	pr_warn("%s: disagrees about version of symbol %s\n", info->name, symname);
+-	return 0;
++	return 1;
+ }
+ 
+ int check_modstruct_version(const struct load_info *info,
+diff --git a/include/linux/sched/user.h b/include/linux/sched/user.h
+index ff04b7637..b3626f202 100644
+--- a/include/linux/sched/user.h
++++ b/include/linux/sched/user.h
+@@ -35,10 +35,16 @@ struct user_struct {
+ 
+ 	/* Miscellaneous per-user rate limit */
+ 	struct ratelimit_state ratelimit;
+-	ANDROID_OEM_DATA_ARRAY(1, 2);
+ 
++#if defined(CONFIG_POSIX_MQUEUE)
++	ANDROID_KABI_USE(1, unsigned long mq_bytes);
++	ANDROID_KABI_RESERVE(2);
++	ANDROID_OEM_DATA_ARRAY(1, 2);
++#else
+ 	ANDROID_KABI_RESERVE(1);
+ 	ANDROID_KABI_RESERVE(2);
++	ANDROID_OEM_DATA_ARRAY(1, 2);
++#endif
+ };
+ 
+ extern int uids_sysfs_init(void);

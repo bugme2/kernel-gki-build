@@ -1,0 +1,69 @@
+name: Kernel Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: 初始化编译环境
+    runs-on: ubuntu-latest
+    permissions: write-all
+
+    steps:
+      - name: 检查服务器性能
+        run: |
+          echo "--------------------------CPU信息--------------------------"
+          echo "CPU物理数量: $(cat /proc/cpuinfo | grep "physical id" | sort | uniq | wc -l)"
+          echo "CPU核心数量: $(nproc)"
+          echo -e "CPU型号信息:$(cat /proc/cpuinfo | grep -m1 name | awk -F: '{print $2}')\n"
+          echo "--------------------------内存信息--------------------------"
+          echo -e "$(sudo lshw -short -C memory | grep GiB)\n"
+          echo "--------------------------硬盘信息--------------------------"
+          echo "硬盘数量: $(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT
+
+      - name: 安装依赖工具
+        run: |
+          sudo curl https://storage.googleapis.com/git-repo-downloads/repo > /usr/local/bin/repo
+          sudo chmod +x /usr/local/bin/repo
+          sudo git config --global user.name "root"
+          sudo git config --global user.email "localhost"
+          sudo timedatectl set-timezone Asia/Shanghai
+
+      - name: 拉取本地仓库
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 同步内核源码
+        run: |
+          repo init --repo-rev=v2.16 --depth=1 -u https://android.googlesource.com/kernel/manifest -b common-android14-6.1-2025-01
+          repo sync -c --no-tags --no-clone-bundle
+
+      - name: 修改源码
+        run: |
+          rm common/android/abi_gki_protected_exports_*
+          sed -i '/if {/,/fi/d' build/kernel/kleaf/workspace_status_stamp.py
+          cp kernel/* -R common
+          cd common && git apply patch.diff
+
+      - name: 编译镜像
+        run: |
+          tools/bazel run --config=fast --config=stamp --lto=thin //common:kernel_aarch64_dist -- --dist_dir=out
+          echo "BUILD_TIME=$(date +'%Y-%m-%d-%H%M')" >> $GITHUB_ENV
+
+      - name: 上传到Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.BUILD_TIME }}
+          files: |
+            out/boot.img
+
+      - name: 清理旧文件
+        uses: ophub/delete-releases-workflows@main
+        with:
+          workflows_keep_day: 0
+          releases_keep_latest: 1
+          delete_tags: true
+          delete_workflows: true
+          delete_releases: true
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
